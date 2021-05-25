@@ -1,11 +1,13 @@
 package com.example.pcbgenerator.pcb;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PcbJsonData {
     public int sizeX;
     public int sizeY;
-    public int[] coordinates;
+    public List<Point> starts;
+    public List<Point> ends;
     public Integer crossingPenalty;
     public Integer pathLengthPenalty;
     public Integer numberOfSectionsPenalty;
@@ -25,43 +27,58 @@ public class PcbJsonData {
         if (sizeY <= 0 || sizeY > 100)
             return "SizeY must be bigger than 0 and less or equal to 100.";
 
-        if (crossingPenalty!=null && crossingPenalty < 0)
+        if (crossingPenalty != null && crossingPenalty < 0)
             return "Crossing penalty must be bigger or equal to 0.";
 
-        if (pathLengthPenalty!=null && pathLengthPenalty < 0)
+        if (pathLengthPenalty != null && pathLengthPenalty < 0)
             return "Path length penalty must be bigger or equal to 0.";
 
-        if (numberOfSectionsPenalty!=null && numberOfSectionsPenalty < 0)
+        if (numberOfSectionsPenalty != null && numberOfSectionsPenalty < 0)
             return "Number of sections penalty must be bigger or equal to 0.";
 
-        if (pathsOutOfPcbPenalty!=null && this.pathsOutOfPcbPenalty < 0)
+        if (pathsOutOfPcbPenalty != null && this.pathsOutOfPcbPenalty < 0)
             return "Paths out of PCB penalty must be bigger or equal to 0.";
 
-        if (pathsOutOfPcbLengthPenalty!=null && this.pathsOutOfPcbLengthPenalty < 0)
+        if (pathsOutOfPcbLengthPenalty != null && this.pathsOutOfPcbLengthPenalty < 0)
             return "Paths out of PCB length penalty must be bigger or equal to 0.";
 
+        this.populationSize = populationSize != null ? populationSize : 100;
 
-        if (populationSize!=null && (this.populationSize < 1 || this.populationSize > 1000))
+        if (this.populationSize < 1 || this.populationSize > 1000)
             return "Population size must be bigger than 0 and less or equal to 1000";
 
-        if (tournamentSize!=null && (this.tournamentSize < 1 || this.tournamentSize > this.populationSize))
+        if (tournamentSize != null && (this.tournamentSize < 1 || this.tournamentSize > this.populationSize))
             return "Tournament size must be bigger than 0 and less or equal to population size.";
 
-        if (numberOfGenerations!=null && (this.numberOfGenerations < 1 || this.numberOfGenerations > 100000))
+        if (numberOfGenerations != null && (this.numberOfGenerations < 1 || this.numberOfGenerations > 100000))
             return "Number of generations must be bigger than 0 and less or equal to 100000.";
 
-        if (coordinates.length % 4 != 0)
-            return "The number of coordinates must be divisible by 4.";
+        if(starts == null)
+            return "Starts parameter is mandatory";
 
-        if(coordinates.length==0)
-            return "Coordinates can not be empty.";
+        if(ends == null)
+            return "Ends parameter is mandatory";
 
-        var iterator = Arrays.stream(coordinates).iterator();
-        while (iterator.hasNext()) {
-            int x = iterator.next();
-            int y = iterator.next();
-            if (x >= sizeX || x < 0 || y >= sizeY || y < 0)
+        if (starts.isEmpty())
+            return "Starts can not be empty.";
+
+        if (ends.isEmpty())
+            return "Ends can not be empty.";
+
+        if (starts.size() != ends.size())
+            return "Starts' size and ends' size must be equal";
+
+        List<Point> points = new ArrayList<>();
+        List<Point> concatenated = new ArrayList<>();
+        concatenated.addAll(starts);
+        concatenated.addAll(ends);
+
+        for (var point : concatenated) {
+            if (point.getX() >= sizeX || point.getX() < 0 || point.getY() >= sizeY || point.getY() < 0)
                 return "Coordinates must be bigger or equal to 0 and less than size in their dimension.";
+            if (points.contains(point))
+                return "Points must have unique coordinate pairs";
+            points.add(point);
         }
 
         return null;

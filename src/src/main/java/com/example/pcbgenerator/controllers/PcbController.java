@@ -6,6 +6,7 @@ import com.example.pcbgenerator.pcb.PcbJsonData;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,7 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class PcbController {
 
 
-    @GetMapping("/pcb")
+    @GetMapping("default")
+    public Pcb getDefault(){
+        return new Pcb();
+    }
+
+    @PostMapping("/pcb")
     public ResponseEntity getPaths(@RequestBody PcbJsonData pcbJsonData) {
         String mess = pcbJsonData.validate();
         if (mess != null) {

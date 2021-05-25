@@ -1,0 +1,36 @@
+{
+    "sizeX": 6,
+    "sizeY": 6,
+    "starts": [
+        {
+            "x": 1,
+            "y": 3
+        },
+        {
+            "x": 3,
+            "y": 1
+        }
+    ],
+    "ends": [
+		{
+            "x": 5,
+            "y": 3
+        },
+        {
+            "x": 3,
+            "y": 3
+        }
+    ],
+    "crossingPenalty": 1000,
+    "pathLengthPenalty": 20,
+    "numberOfSectionsPenalty": 1,
+    "pathsOutOfPcbPenalty": 2000,
+    "pathsOutOfPcbLengthPenalty": 1500,
+    "populationSize": 100,
+    "tournamentSize": 10,
+    "numberOfGenerations": 1000,
+    "crossingProbability": 0.6,
+    "swapProbability": 0.2,
+    "mutationProbability": 0.2,
+    "rouletteSelection": false
+}

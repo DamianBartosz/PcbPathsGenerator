@@ -1,8 +1,8 @@
 package com.example.pcbgenerator.pcb;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 
 public class Pcb {
@@ -28,7 +28,7 @@ public class Pcb {
     public final boolean rouletteSelection;
 
 
-    public Pcb(int sizeX, int sizeY, int[] coordinates, Integer crossingPenalty, Integer pathLengthPenalty,
+    public Pcb(int sizeX, int sizeY, List<Point> starts, List<Point> ends, Integer crossingPenalty, Integer pathLengthPenalty,
                Integer numberOfSectionsPenalty, Integer pathsOutOfPcbPenalty, Integer pathsOutOfPcbLengthPenalty,
                Integer populationSize, Integer tournamentSize, Integer numberOfGenerations, Double crossingProbability, Double swapProbability,
                Double mutationProbability, Boolean rouletteSelection) {
@@ -38,8 +38,6 @@ public class Pcb {
         if (sizeY <= 0 || sizeY > 100)
             throw new IllegalArgumentException("SizeY must be bigger than 0 and less or equal to 100.");
         this.sizeY = sizeY;
-        this.starts = new ArrayList<>();
-        this.ends = new ArrayList<>();
 
         this.crossingPenalty = crossingPenalty != null ? crossingPenalty : 1000;
         if (this.crossingPenalty < 0)
@@ -81,28 +79,34 @@ public class Pcb {
 
         this.rouletteSelection = rouletteSelection != null ? rouletteSelection : false;
 
-        if (coordinates.length % 4 != 0) {
-            throw new IllegalArgumentException("The number of coordinates must be divisible by 4.");
+        if (starts.isEmpty())
+            throw new IllegalArgumentException("Starts can not be empty.");
+
+        if (ends.isEmpty())
+            throw new IllegalArgumentException("Ends can not be empty.");
+
+        if (starts.size() != ends.size())
+            throw new IllegalArgumentException("Starts' size and ends' size must be equal");
+
+        List<Point> points = new ArrayList<>();
+        List<Point> concatenated = new ArrayList<>();
+        concatenated.addAll(starts);
+        concatenated.addAll(ends);
+
+        for (var point : concatenated) {
+            if (point.getX() >= sizeX || point.getX() < 0 || point.getY() >= sizeY || point.getY() < 0)
+                throw new IllegalArgumentException("Coordinates must be bigger or equal to 0 and less than size in their dimension.");
+            if (points.contains(point))
+                throw new IllegalArgumentException("Points must have unique coordinate pairs");
+            points.add(point);
         }
 
-        var iterator = Arrays.stream(coordinates).iterator();
-        while (iterator.hasNext()) {
-            int x = iterator.next();
-            int y = iterator.next();
-            if (x >= sizeX || x < 0 || y >= sizeY || y < 0)
-                throw new IllegalArgumentException("Coordinates must be bigger or equal to 0 and less than size in their dimension.");
-            starts.add(new Point(x, y));
-
-            x = iterator.next();
-            y = iterator.next();
-            if (x >= sizeX || y >= sizeY)
-                throw new IllegalArgumentException("Coordinates must be bigger or equal to 0 and less than size in their dimension.");
-            ends.add(new Point(x, y));
-        }
+        this.starts = starts;
+        this.ends = ends;
     }
 
     public Pcb(PcbJsonData pjd) {
-        this(pjd.sizeX, pjd.sizeY, pjd.coordinates, pjd.crossingPenalty, pjd.pathLengthPenalty, pjd.numberOfSectionsPenalty,
+        this(pjd.sizeX, pjd.sizeY, pjd.starts, pjd.ends, pjd.crossingPenalty, pjd.pathLengthPenalty, pjd.numberOfSectionsPenalty,
                 pjd.pathsOutOfPcbPenalty, pjd.pathsOutOfPcbLengthPenalty, pjd.populationSize, pjd.tournamentSize,
                 pjd.numberOfGenerations, pjd.crossingProbability, pjd.swapProbability, pjd.mutationProbability, pjd.rouletteSelection);
     }
@@ -112,6 +116,9 @@ public class Pcb {
         this.sizeY = 10;
         this.starts = new ArrayList<>();
         this.ends = new ArrayList<>();
+
+        starts.add(new Point(1, 2));
+        starts.add(new Point(2, 2));
 
         this.crossingPenalty = 1000;
         this.pathLengthPenalty = 20;
