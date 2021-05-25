@@ -1,4 +1,4 @@
-package com.example.pcbgenerator.rest_service;
+package com.example.pcbgenerator.pcb;
 
 import java.util.Arrays;
 

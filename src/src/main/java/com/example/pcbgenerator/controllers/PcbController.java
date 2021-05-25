@@ -1,8 +1,8 @@
-package com.example.pcbgenerator.rest_service;
+package com.example.pcbgenerator.controllers;
 
 import com.example.pcbgenerator.genetic_elements.GeneticAlgorithm;
-import com.example.pcbgenerator.genetic_elements.Individual;
 import com.example.pcbgenerator.pcb.Pcb;
+import com.example.pcbgenerator.pcb.PcbJsonData;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

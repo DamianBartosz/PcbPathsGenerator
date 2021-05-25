@@ -1,7 +1,5 @@
 package com.example.pcbgenerator.pcb;
 
-import com.example.pcbgenerator.rest_service.PcbJsonData;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
