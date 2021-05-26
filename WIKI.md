@@ -4,11 +4,14 @@
 
 ### 1.1. Problem
 Jednowarstwowa płytka drukowana jest ograniczoną płaszczyzną (w naszym przypadku prostokątną), na którą nałożone zostały punkty lutownicze o podanych współrzędnych całkowitych (maksymalnie jeden punkt na parę współrzędnych). Punkty są uporządkowane parami, które należy połączyć ścieżką. 
+
 Problem polega na takim zaprojektowaniu ścieżek, żeby dowolne dwa punkty lutownicze zostały połączone wtedy i tylko wtedy gdy było między nimi planowane połączenie - wszystkie zaplanowane pary muszą zostać połączone i żadne ścieżki nie mogę się przecinać, ani wykraczać poza obszar płytki.
+
 Optymalne rozwiązanie to takie, które spełnia wszystkie ograniczenia, a długość ścieżek jest możliwie najkrótsza.
 
 ### 1.2. Algorytm genetyczny
 Sposobem na rozwiązanie problemu projektowania płytek drukowanych są algorytmy genetyczne. Jest to przykład metaheurystyki stosowanej do rozwiązywania problemów optymalizacyjnych. Algorytm swoją nazwę zawdzięcza procesowi ewolucji organizmów, na którym jest wzorowany.
+
 W algorytmie genetycznym tworzony jest n-elementowy zbiór losowych rozwiązań (osobników). Z tak utworzonej populacji, dokonywana jest selekcja dwóch elementów w oparciu o funkcję oceny osobników. Wybrane rozwiązania są ze sobą następnie krzyżowane, a wynikowe osobniki z pewnym prawdopodobieństwem poddawane są drobnej modyfikacji(mutacji). W wyniku selekcji, krzyżowania i mutacji otrzymujemy następne pokolenie: nową n-elementową populację, a proces rozpoczyna się od nowa. Działanie algorytmu kończy się w momencie spełnienia warunku kończącego (np. osiągnięcie określonej liczby pokoleń), a jego wynikiem jest osobnik o najlepszej wartości funkcji oceniającej.
 
 ### 1.3. Kodowanie osobnika
@@ -19,7 +22,9 @@ Inicjalizacja polega na utworzeniu n początkowych osobników. Każdy osobnik tw
 
 ### 1.5. Funkcja oceny
 Każdy osobnik oceniany jest wg wzoru:
+
 P = k1w1 + k2w2 + k3w3 + k4w4 + k5w5
+
 ,gdzie:
 - k1 – sumaryczna liczba segmentów wchodzących w skład ścieżek
 - k2 – sumaryczna długość ścieżek
@@ -27,11 +32,14 @@ P = k1w1 + k2w2 + k3w3 + k4w4 + k5w5
 - k4 – sumaryczna długość fragmentów ścieżek wykraczających poza płytkę
 - k5 – sumaryczna liczba segmentów ścieżek wykraczających poza płytkę
 - w1-5 – wagi poszczególnych parametrów.
+
 Dla tak przyjętej funkcji przystosowania najlepszym rozwiązaniem będzie to o najniższej sumie kar.
 
 ### 1.6. Selekcja
 Dokonanie selekcji może zostać wykonane za pomocą 2 operatorów: turniej i ruletka.
+
 Operator turniejowy polega na losowym wybraniu T osobników spośród populacji. Następnie spośród wybranych osobników zwrócony zostaje najbardziej przystosowany spośród nich.
+
 Operator ruletki przypisuje każdemu osobnikowi prawdopodobieństwo jego wylosowania na podstawie jego przystosowania. Prawdopodobieństwo wylosowania każdego osobnika jest przeciwnie proporcjonalne do wyniku funkcji oceniającej.
 
 ### 1.7. Krzyżowanie
@@ -42,12 +50,19 @@ Po dokonaniu selekcji i krzyżowania otrzymane osobniki z pewnym prawdopodobień
 
 ## 2. Źródła
 [1] Wiktor Walentynowicz, Artur Zawisza - Algorytm Genetyczny - implementacja i badanie - Laboratorium SI zadanie 1
+
 [2] Arabas J. - Wykłady z algorytmów ewolucyjnych (http://staff.elka.pw.edu.pl/~jarabas/ksiazka.html)
+
 [3] Goldberg D. - Algorytmy genetyczne i ich zastosowanie
+
 [4] Michalewicz Z. - Algorytmy genetyczne + struktury danych = programy ewolucyjne, WNT.
+
 [5] Krunoslav Puljić, Robert Manger - „Comparison of eight evolutionary crossover operators for the vehicle routing problem”, MATHEMATICAL COMMUNICATIONS Math. Commun. 18(2013), 359–375
+
 [6] Potvin, Jean-Yves - 1996. Genetic algorithms for the the traveling salesman problem,Annals of Operations Research, Volume 63, pages 339-370.
+
 [7] http://edu.pjwstk.edu.pl/wyklady/nai/scb/wyklad10/w10.htm
+
 [8] Pasek R. - „Techniki Ewolucyjne w projektowaniu układu ścieżek na płytkach drukowanych”
 
 ## 3. Przykładowe dane
@@ -108,7 +123,9 @@ Po dokonaniu selekcji i krzyżowania otrzymane osobniki z pewnym prawdopodobień
 
 ## 4. Dostępne endpointy
 GET / - strona główna zawierająca tą dokumentację oraz moduł pozwalający przetestować endpoint /pcb
+
 GET /default - zwraca obiekt JSON zawierający domyślne wartości parametrów
+
 POST /pcb - uruchamia algorytm genetyczny dla zadanych parametrów i zwraca uzyskane rozwiązanie
 
 ## 5. Opis wywołania
@@ -118,6 +135,7 @@ Po uruchomieniu usługi można sprawdzić jej działanie poprzez stronę główn
 
 ## 6. Uruchomienie kontenera z usługą
 Korzystając z Docker CLI obraz może zostać uruchomiony poprzez użycie polecenia:
+
 ```docker run -p {port}:8080 damianbartosz/pcb-paths-generator```
 
 ## 7. Linki
