@@ -6,7 +6,6 @@ import com.example.pcbgenerator.pcb.Point;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 
 import org.springframework.data.util.Pair;

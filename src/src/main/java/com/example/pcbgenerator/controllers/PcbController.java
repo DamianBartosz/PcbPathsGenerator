@@ -12,10 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class PcbController {
-
-
     @GetMapping("default")
-    public Pcb getDefault(){
+    public Pcb getDefault() {
         return new Pcb();
     }
 
