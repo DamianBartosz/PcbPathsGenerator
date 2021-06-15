@@ -3,80 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <title>PCB Generator</title>
+
+    <style>
+        body {
+            background-color: aqua;
+        }
+
+        #content {
+            margin: 2em;
+            padding: 1em;
+            border-radius: 1em;
+            background-color: white;
+        }
+
+        #json {
+            display: grid;
+            grid-template-columns: 8fr 1fr 8fr;
+        }
+
+        textarea {
+            padding: 2em;
+        }
+
+        #json_input_button {
+            font-size: 2em;
+        }
+
+        h1, h2, h3 {
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-<h1 id="generator-p-ytek-drukowanych-pcb">Generator płytek drukowanych PCB</h1>
-<h2 id="1-opis">1. Opis</h2>
-<h3 id="1-1-problem">1.1. Problem</h3>
-<p>Jednowarstwowa płytka drukowana jest ograniczoną płaszczyzną (w naszym przypadku prostokątną), na którą nałożone
-    zostały punkty lutownicze o podanych współrzędnych całkowitych (maksymalnie jeden punkt na parę współrzędnych).
-    Punkty są uporządkowane parami, które należy połączyć ścieżką. </p>
-<p>Problem polega na takim zaprojektowaniu ścieżek, żeby dowolne dwa punkty lutownicze zostały połączone wtedy i tylko
-    wtedy gdy było między nimi planowane połączenie - wszystkie zaplanowane pary muszą zostać połączone i żadne ścieżki
-    nie mogę się przecinać, ani wykraczać poza obszar płytki.</p>
-<p>Optymalne rozwiązanie to takie, które spełnia wszystkie ograniczenia, a długość ścieżek jest możliwie najkrótsza.</p>
-<h3 id="1-2-algorytm-genetyczny">1.2. Algorytm genetyczny</h3>
-<p>Sposobem na rozwiązanie problemu projektowania płytek drukowanych są algorytmy genetyczne. Jest to przykład
-    metaheurystyki stosowanej do rozwiązywania problemów optymalizacyjnych. Algorytm swoją nazwę zawdzięcza procesowi
-    ewolucji organizmów, na którym jest wzorowany.</p>
-<p>W algorytmie genetycznym tworzony jest n-elementowy zbiór losowych rozwiązań (osobników). Z tak utworzonej populacji,
-    dokonywana jest selekcja dwóch elementów w oparciu o funkcję oceny osobników. Wybrane rozwiązania są ze sobą
-    następnie krzyżowane, a wynikowe osobniki z pewnym prawdopodobieństwem poddawane są drobnej modyfikacji(mutacji). W
-    wyniku selekcji, krzyżowania i mutacji otrzymujemy następne pokolenie: nową n-elementową populację, a proces
-    rozpoczyna się od nowa. Działanie algorytmu kończy się w momencie spełnienia warunku kończącego (np. osiągnięcie
-    określonej liczby pokoleń), a jego wynikiem jest osobnik o najlepszej wartości funkcji oceniającej.</p>
-<h3 id="1-3-kodowanie-osobnika">1.3. Kodowanie osobnika</h3>
-<p>Każdy osobnik (rozwiązanie) posiada listę ścieżek (jedna ścieżka dla każdej pary punktów, które należy połączyć).
-    Każda ze ścieżek posiada informacje o punkcie początkowym i końcowym, oraz uporządkowaną listę segmentów. Każdy
-    segment ma określony kierunek (góra, dół, lewo, prawo) oraz liczbę kroków (przesunięcie w danym kierunku).</p>
-<h3 id="1-4-inicjalizacja">1.4. Inicjalizacja</h3>
-<p>Inicjalizacja polega na utworzeniu n początkowych osobników. Każdy osobnik tworzy losowe ścieżki dla każdej pary
-    punktów do połączenia. Losowanie ścieżki polega na dodawaniu na przemian segmentów poziomych i pionowych o losowej
-    długości i kierunku (przy czym długość jest tak ograniczona, że ścieżka nie może wykroczyć poza obszar płytki oraz
-    prawdopodobieństwo wyboru kierunku w stronę punktu końcowego jest większe niż przeciwnego). Po wygenerowaniu ścieżki
-    jest ona optymalizowana poprzez usunięcie zapętleń.</p>
-<h3 id="1-5-funkcja-oceny">1.5. Funkcja oceny</h3>
-<p>Każdy osobnik oceniany jest wg wzoru:</p>
-<p>P = k1w1 + k2w2 + k3w3 + k4w4 + k5w5</p>
-<p>,gdzie:</p>
-<ul>
-    <li>k1 – sumaryczna liczba segmentów wchodzących w skład ścieżek</li>
-    <li>k2 – sumaryczna długość ścieżek</li>
-    <li>k3 – liczba przecięć ścieżek</li>
-    <li>k4 – sumaryczna długość fragmentów ścieżek wykraczających poza płytkę</li>
-    <li>k5 – sumaryczna liczba segmentów ścieżek wykraczających poza płytkę</li>
-    <li>w1-5 – wagi poszczególnych parametrów.</li>
-</ul>
-<p>Dla tak przyjętej funkcji przystosowania najlepszym rozwiązaniem będzie to o najniższej sumie kar.</p>
-<h3 id="1-6-selekcja">1.6. Selekcja</h3>
-<p>Dokonanie selekcji może zostać wykonane za pomocą 2 operatorów: turniej i ruletka.</p>
-<p>Operator turniejowy polega na losowym wybraniu T osobników spośród populacji. Następnie spośród wybranych osobników
-    zwrócony zostaje najbardziej przystosowany spośród nich.</p>
-<p>Operator ruletki przypisuje każdemu osobnikowi prawdopodobieństwo jego wylosowania na podstawie jego przystosowania.
-    Prawdopodobieństwo wylosowania każdego osobnika jest przeciwnie proporcjonalne do wyniku funkcji oceniającej.</p>
-<h3 id="1-7-krzy-owanie">1.7. Krzyżowanie</h3>
-<p>Po wyborze pary osobników, potomkowie mogą powstać poprzez kopiowanie rodziców lub poprzez dokonanie krzyżowania.
-    Krzyżowanie rozwiązania następuje poprzez iterowanie po listach ścieżek obu rodziców. Dla każdej pary ścieżek z
-    odpowiednim prawdopodobieństwem następuje ich wymiana. Tak otrzymujemy parę potomków.</p>
-<h3 id="1-8-mutacja">1.8. Mutacja</h3>
-<p>Po dokonaniu selekcji i krzyżowania otrzymane osobniki z pewnym prawdopodobieństwem mogą zostać poddane mutacji.
-    Polega ona na losowym wyborze jednej ścieżki oraz przesunięciu fragmentu losowego segmentu tej ścieżki.</p>
-<h2 id="2-r-d-a">2. Źródła</h2>
-<p>[1] Wiktor Walentynowicz, Artur Zawisza - Algorytm Genetyczny - implementacja i badanie - Laboratorium SI zadanie
-    1</p>
-<p>[2] Arabas J. - Wykłady z algorytmów ewolucyjnych (<a href="http://staff.elka.pw.edu.pl/~jarabas/ksiazka.html">http://staff.elka.pw.edu.pl/~jarabas/ksiazka.html</a>)
-</p>
-<p>[3] Goldberg D. - Algorytmy genetyczne i ich zastosowanie</p>
-<p>[4] Michalewicz Z. - Algorytmy genetyczne + struktury danych = programy ewolucyjne, WNT.</p>
-<p>[5] Krunoslav Puljić, Robert Manger - „Comparison of eight evolutionary crossover operators for the vehicle routing
-    problem”, MATHEMATICAL COMMUNICATIONS Math. Commun. 18(2013), 359–375</p>
-<p>[6] Potvin, Jean-Yves - 1996. Genetic algorithms for the the traveling salesman problem,Annals of Operations
-    Research, Volume 63, pages 339-370.</p>
-<p>[7] <a href="http://edu.pjwstk.edu.pl/wyklady/nai/scb/wyklad10/w10.htm">http://edu.pjwstk.edu.pl/wyklady/nai/scb/wyklad10/w10.htm</a>
-</p>
-<p>[8] Pasek R. - „Techniki Ewolucyjne w projektowaniu układu ścieżek na płytkach drukowanych”</p>
-<h2 id="3-przyk-adowe-dane">3. Przykładowe dane</h2>
-<pre><code class="lang-json">{
+<div id="content">
+    <h1 id="generator-p-ytek-drukowanych-pcb">Generator płytek drukowanych PCB</h1>
+    <h2 id="1-opis">1. Opis</h2>
+    <h3 id="1-1-problem">1.1. Problem</h3>
+    <p>Jednowarstwowa płytka drukowana jest ograniczoną płaszczyzną (w naszym przypadku prostokątną), na którą nałożone
+        zostały punkty lutownicze o podanych współrzędnych całkowitych (maksymalnie jeden punkt na parę współrzędnych).
+        Punkty są uporządkowane parami, które należy połączyć ścieżką. </p>
+    <p>Problem polega na takim zaprojektowaniu ścieżek, żeby dowolne dwa punkty lutownicze zostały połączone wtedy i
+        tylko
+        wtedy gdy było między nimi planowane połączenie - wszystkie zaplanowane pary muszą zostać połączone i żadne
+        ścieżki
+        nie mogę się przecinać, ani wykraczać poza obszar płytki.</p>
+    <p>Optymalne rozwiązanie to takie, które spełnia wszystkie ograniczenia, a długość ścieżek jest możliwie
+        najkrótsza.</p>
+    <h3 id="1-2-algorytm-genetyczny">1.2. Algorytm genetyczny</h3>
+    <p>Sposobem na rozwiązanie problemu projektowania płytek drukowanych są algorytmy genetyczne. Jest to przykład
+        metaheurystyki stosowanej do rozwiązywania problemów optymalizacyjnych. Algorytm swoją nazwę zawdzięcza
+        procesowi
+        ewolucji organizmów, na którym jest wzorowany.</p>
+    <p>W algorytmie genetycznym tworzony jest n-elementowy zbiór losowych rozwiązań (osobników). Z tak utworzonej
+        populacji,
+        dokonywana jest selekcja dwóch elementów w oparciu o funkcję oceny osobników. Wybrane rozwiązania są ze sobą
+        następnie krzyżowane, a wynikowe osobniki z pewnym prawdopodobieństwem poddawane są drobnej
+        modyfikacji(mutacji). W
+        wyniku selekcji, krzyżowania i mutacji otrzymujemy następne pokolenie: nową n-elementową populację, a proces
+        rozpoczyna się od nowa. Działanie algorytmu kończy się w momencie spełnienia warunku kończącego (np. osiągnięcie
+        określonej liczby pokoleń), a jego wynikiem jest osobnik o najlepszej wartości funkcji oceniającej.</p>
+    <h3 id="1-3-kodowanie-osobnika">1.3. Kodowanie osobnika</h3>
+    <p>Każdy osobnik (rozwiązanie) posiada listę ścieżek (jedna ścieżka dla każdej pary punktów, które należy połączyć).
+        Każda ze ścieżek posiada informacje o punkcie początkowym i końcowym, oraz uporządkowaną listę segmentów. Każdy
+        segment ma określony kierunek (góra, dół, lewo, prawo) oraz liczbę kroków (przesunięcie w danym kierunku).</p>
+    <h3 id="1-4-inicjalizacja">1.4. Inicjalizacja</h3>
+    <p>Inicjalizacja polega na utworzeniu n początkowych osobników. Każdy osobnik tworzy losowe ścieżki dla każdej pary
+        punktów do połączenia. Losowanie ścieżki polega na dodawaniu na przemian segmentów poziomych i pionowych o
+        losowej
+        długości i kierunku (przy czym długość jest tak ograniczona, że ścieżka nie może wykroczyć poza obszar płytki
+        oraz
+        prawdopodobieństwo wyboru kierunku w stronę punktu końcowego jest większe niż przeciwnego). Po wygenerowaniu
+        ścieżki
+        jest ona optymalizowana poprzez usunięcie zapętleń.</p>
+    <h3 id="1-5-funkcja-oceny">1.5. Funkcja oceny</h3>
+    <p>Każdy osobnik oceniany jest wg wzoru:</p>
+    <p>P = k1w1 + k2w2 + k3w3 + k4w4 + k5w5</p>
+    <p>,gdzie:</p>
+    <ul>
+        <li>k1 – sumaryczna liczba segmentów wchodzących w skład ścieżek</li>
+        <li>k2 – sumaryczna długość ścieżek</li>
+        <li>k3 – liczba przecięć ścieżek</li>
+        <li>k4 – sumaryczna długość fragmentów ścieżek wykraczających poza płytkę</li>
+        <li>k5 – sumaryczna liczba segmentów ścieżek wykraczających poza płytkę</li>
+        <li>w1-5 – wagi poszczególnych parametrów.</li>
+    </ul>
+    <p>Dla tak przyjętej funkcji przystosowania najlepszym rozwiązaniem będzie to o najniższej sumie kar.</p>
+    <h3 id="1-6-selekcja">1.6. Selekcja</h3>
+    <p>Dokonanie selekcji może zostać wykonane za pomocą 2 operatorów: turniej i ruletka.</p>
+    <p>Operator turniejowy polega na losowym wybraniu T osobników spośród populacji. Następnie spośród wybranych
+        osobników
+        zwrócony zostaje najbardziej przystosowany spośród nich.</p>
+    <p>Operator ruletki przypisuje każdemu osobnikowi prawdopodobieństwo jego wylosowania na podstawie jego
+        przystosowania.
+        Prawdopodobieństwo wylosowania każdego osobnika jest przeciwnie proporcjonalne do wyniku funkcji
+        oceniającej.</p>
+    <h3 id="1-7-krzy-owanie">1.7. Krzyżowanie</h3>
+    <p>Po wyborze pary osobników, potomkowie mogą powstać poprzez kopiowanie rodziców lub poprzez dokonanie krzyżowania.
+        Krzyżowanie rozwiązania następuje poprzez iterowanie po listach ścieżek obu rodziców. Dla każdej pary ścieżek z
+        odpowiednim prawdopodobieństwem następuje ich wymiana. Tak otrzymujemy parę potomków.</p>
+    <h3 id="1-8-mutacja">1.8. Mutacja</h3>
+    <p>Po dokonaniu selekcji i krzyżowania otrzymane osobniki z pewnym prawdopodobieństwem mogą zostać poddane mutacji.
+        Polega ona na losowym wyborze jednej ścieżki oraz przesunięciu fragmentu losowego segmentu tej ścieżki.</p>
+    <h2 id="2-r-d-a">2. Źródła</h2>
+    <p>[1] Wiktor Walentynowicz, Artur Zawisza - Algorytm Genetyczny - implementacja i badanie - Laboratorium SI zadanie
+        1</p>
+    <p>[2] Arabas J. - Wykłady z algorytmów ewolucyjnych (<a href="http://staff.elka.pw.edu.pl/~jarabas/ksiazka.html">http://staff.elka.pw.edu.pl/~jarabas/ksiazka.html</a>)
+    </p>
+    <p>[3] Goldberg D. - Algorytmy genetyczne i ich zastosowanie</p>
+    <p>[4] Michalewicz Z. - Algorytmy genetyczne + struktury danych = programy ewolucyjne, WNT.</p>
+    <p>[5] Krunoslav Puljić, Robert Manger - „Comparison of eight evolutionary crossover operators for the vehicle
+        routing
+        problem”, MATHEMATICAL COMMUNICATIONS Math. Commun. 18(2013), 359–375</p>
+    <p>[6] Potvin, Jean-Yves - 1996. Genetic algorithms for the the traveling salesman problem,Annals of Operations
+        Research, Volume 63, pages 339-370.</p>
+    <p>[7] <a href="http://edu.pjwstk.edu.pl/wyklady/nai/scb/wyklad10/w10.htm">http://edu.pjwstk.edu.pl/wyklady/nai/scb/wyklad10/w10.htm</a>
+    </p>
+    <p>[8] Pasek R. - „Techniki Ewolucyjne w projektowaniu układu ścieżek na płytkach drukowanych”</p>
+    <h2 id="3-przyk-adowe-dane">3. Przykładowe dane</h2>
+    <pre><code class="lang-json">{
     <span class="hljs-attr">"sizeX"</span>: <span class="hljs-number">6</span>,
     <span class="hljs-attr">"sizeY"</span>: <span class="hljs-number">6</span>,
     <span class="hljs-attr">"starts"</span>: [
@@ -113,83 +157,92 @@
     <span class="hljs-attr">"rouletteSelection"</span>: <span class="hljs-literal">false</span>
 }
 </code></pre>
-<ul>
-    <li>sizeX - szerokość płytki drukowanej (liczba całkowita - pole obligatoryjne)</li>
-    <li>sizeY - wysokość płytki drukowanej (liczba całkowita - pole obligatoryjne)</li>
-    <li>starts - lista punktów początkowych (pole obligatoryjne)</li>
-    <li>ends - lista punktów końcowych (pole obligatoryjne)</li>
-    <li>crossingPenalty - wartość kary funkcji oceniającej za każde przecięcie ścieżek (liczba całkowita - pole
-        opcjonalne)
-    </li>
-    <li>pathLengthPenalty - wartość kary funkcji oceniającej za długość ścieżek (liczba całkowita - pole opcjonalne)
-    </li>
-    <li>numberOfSectionsPenalty - wartość kary funkcji oceniającej za liczbę segmentów w ścieżkach (liczba całkowita -
-        pole opcjonalne)
-    </li>
-    <li>pathsOutOfPcbPenalty - wartość kary funkcji oceniającej za liczbę ścieżek wykraczających poza obszar PCB (liczba
-        całkowita - pole opcjonalne)
-    </li>
-    <li>pathsOutOfPcbLengthPenalty - wartość kary funkcji oceniającej za długość fragmentów ścieżek poza PCB (liczba
-        całkowita - pole opcjonalne)
-    </li>
-    <li>populationSize - wielkość populacji (liczba całkowita - pole opcjonalne)</li>
-    <li>tournamentSize - wielkość turnieju (liczba całkowita - pole opcjonalne)</li>
-    <li>numberOfGenerations - liczba pokoleń (liczba całkowita - pole opcjonalne)</li>
-    <li>crossingProbability - prawdopodobieństwo krzyżowania (liczba zmiennoprzecinkowa - pole opcjonalne)</li>
-    <li>swapProbability - prawdopodobieństwo zamiany ścieżek podczas krzyżowania (liczba zmiennoprzecinkowa - pole
-        opcjonalne)
-    </li>
-    <li>mutationProbability - prawdopodobieństwo mutacji (liczba zmiennoprzecinkowa - pole opcjonalne)</li>
-    <li>rouletteSelection - wybór operatora selekcji (boolean - pole opcjonalne) (true - operator ruletki, false
-        (domyślne) operator turniejowy
-    </li>
-</ul>
-<h2 id="4-dost-pne-endpointy">4. Dostępne endpointy</h2>
-<p>GET / - strona główna zawierająca tą dokumentację oraz moduł pozwalający przetestować endpoint /pcb</p>
-<p>GET /default - zwraca obiekt JSON zawierający domyślne wartości parametrów</p>
-<p>POST /pcb - uruchamia algorytm genetyczny dla zadanych parametrów i zwraca uzyskane rozwiązanie</p>
-<h2 id="5-opis-wywo-ania">5. Opis wywołania</h2>
-<p>Po uruchomieniu usługi można sprawdzić jej działanie poprzez stronę główną dostępną pod adresem: </p>
-<ul>
-    <li><a href="http://localhost:{port}/">http://localhost:{port}/</a> (w przypadku uruchomienia lokalnie)</li>
-    <li><a href="https://pcb-path-generator.herokuapp.com">https://pcb-path-generator.herokuapp.com</a> (w przypadku
-        korzystania z serwera heroku)
-    </li>
-</ul>
-<h2 id="6-uruchomienie-kontenera-z-us-ug-">6. Uruchomienie kontenera z usługą</h2>
-<p>Korzystając z Docker CLI obraz może zostać uruchomiony poprzez użycie polecenia:</p>
-<p><code>docker run -p {port}:8080 damianbartosz/pcb-paths-generator</code></p>
-<h2 id="7-linki">7. Linki</h2>
-<ul>
-    <li>nazwa obrazu w repozytorium obrazów
-        <ul>
-            <li>damianbartosz/pcb-paths-generator</li>
-        </ul>
-    </li>
-    <li>lokalizacja przykładowych danych
-        <ul>
-            <li>.../data</li>
-        </ul>
-    </li>
-</ul>
-<h2 id="8-test">8. Wypróbuj</h2>
+    <ul>
+        <li>sizeX - szerokość płytki drukowanej (liczba całkowita - pole obligatoryjne)</li>
+        <li>sizeY - wysokość płytki drukowanej (liczba całkowita - pole obligatoryjne)</li>
+        <li>starts - lista punktów początkowych (pole obligatoryjne)</li>
+        <li>ends - lista punktów końcowych (pole obligatoryjne)</li>
+        <li>crossingPenalty - wartość kary funkcji oceniającej za każde przecięcie ścieżek (liczba całkowita - pole
+            opcjonalne)
+        </li>
+        <li>pathLengthPenalty - wartość kary funkcji oceniającej za długość ścieżek (liczba całkowita - pole opcjonalne)
+        </li>
+        <li>numberOfSectionsPenalty - wartość kary funkcji oceniającej za liczbę segmentów w ścieżkach (liczba całkowita
+            -
+            pole opcjonalne)
+        </li>
+        <li>pathsOutOfPcbPenalty - wartość kary funkcji oceniającej za liczbę ścieżek wykraczających poza obszar PCB
+            (liczba
+            całkowita - pole opcjonalne)
+        </li>
+        <li>pathsOutOfPcbLengthPenalty - wartość kary funkcji oceniającej za długość fragmentów ścieżek poza PCB (liczba
+            całkowita - pole opcjonalne)
+        </li>
+        <li>populationSize - wielkość populacji (liczba całkowita - pole opcjonalne)</li>
+        <li>tournamentSize - wielkość turnieju (liczba całkowita - pole opcjonalne)</li>
+        <li>numberOfGenerations - liczba pokoleń (liczba całkowita - pole opcjonalne)</li>
+        <li>crossingProbability - prawdopodobieństwo krzyżowania (liczba zmiennoprzecinkowa - pole opcjonalne)</li>
+        <li>swapProbability - prawdopodobieństwo zamiany ścieżek podczas krzyżowania (liczba zmiennoprzecinkowa - pole
+            opcjonalne)
+        </li>
+        <li>mutationProbability - prawdopodobieństwo mutacji (liczba zmiennoprzecinkowa - pole opcjonalne)</li>
+        <li>rouletteSelection - wybór operatora selekcji (boolean - pole opcjonalne) (true - operator ruletki, false
+            (domyślne) operator turniejowy
+        </li>
+    </ul>
+    <h2 id="4-dost-pne-endpointy">4. Dostępne endpointy</h2>
+    <p>GET / - strona główna zawierająca tą dokumentację oraz moduł pozwalający przetestować endpoint /pcb</p>
+    <p>GET /default - zwraca obiekt JSON zawierający domyślne wartości parametrów</p>
+    <p>POST /pcb - uruchamia algorytm genetyczny dla zadanych parametrów i zwraca uzyskane rozwiązanie</p>
+    <h2 id="5-opis-wywo-ania">5. Opis wywołania</h2>
+    <p>Po uruchomieniu usługi można sprawdzić jej działanie poprzez stronę główną dostępną pod adresem: </p>
+    <ul>
+        <li><a href="http://localhost:{port}/">http://localhost:{port}/</a> (w przypadku uruchomienia lokalnie)</li>
+        <li><a href="https://pcb-path-generator.herokuapp.com">https://pcb-path-generator.herokuapp.com</a> (w przypadku
+            korzystania z serwera heroku)
+        </li>
+    </ul>
+    <h2 id="6-uruchomienie-kontenera-z-us-ug-">6. Uruchomienie kontenera z usługą</h2>
+    <p>Korzystając z Docker CLI obraz może zostać uruchomiony poprzez użycie polecenia:</p>
+    <p><code>docker run -p {port}:8080 damianbartosz/pcb-paths-generator</code></p>
+    <h2 id="7-linki">7. Linki</h2>
+    <ul>
+        <li>nazwa obrazu w repozytorium obrazów
+            <ul>
+                <li>damianbartosz/pcb-paths-generator</li>
+            </ul>
+        </li>
+        <li>lokalizacja przykładowych danych
+            <ul>
+                <li>.../data</li>
+            </ul>
+        </li>
+    </ul>
+    <h2 id="8-test">8. Wypróbuj</h2>
 
-<textarea id="json_input" rows="50" cols="80">
-    Wpisz tutaj dane (np. przykładowe dane z punktu 3.)
-</textarea>
-<br>
-<input type="button" id="json_input_button" value="Wyślij" onclick="getDataFromApi()">
-<br>
-<textarea id="json_output" rows="50" cols="80" disabled>
-    Tutaj pojawi się wynik zapytania
-</textarea>
-<br><br>
-<canvas width="1000" height="600" id="pcb_image" style="border: 1px solid black">
-
-
-</canvas>
+    <div id="json">
+        <textarea id="json_input" rows="50" cols="80">Wpisz tutaj dane (np. przykładowe dane z punktu 3.)</textarea>
+        <input type="button" id="json_input_button" value=">>" onclick="getDataFromApi()">
+        <textarea id="json_output" rows="50" cols="80" disabled>Tutaj pojawi się wynik zapytania</textarea>
+    </div>
+    <br><br>
+    <canvas height="600" id="pcb_image" style="border: 1px solid black; margin:auto;"></canvas>
+</div>
 </body>
 <script>
+    const canvas = document.getElementById("pcb_image");
+    let responseData = "";
+
+    window.addEventListener('resize', resizeCanvas, false);
+
+    function resizeCanvas() {
+        const content = document.getElementById("content");
+        canvas.width = content.offsetWidth - parseInt(window.getComputedStyle(content, "").getPropertyValue('padding'), 10) * 2;
+        if (responseData !== "") drawPCB();
+    }
+
+    resizeCanvas();
+
     async function getDataFromApi() {
         const json_input = document.getElementById("json_input");
         const json_output = document.getElementById("json_output");
@@ -203,20 +256,18 @@
         }).then(res => res.json())
             .then(res => {
                 json_output.value = JSON.stringify(res, null, 2);
-                drawPCB(res);
+                responseData = res;
+                drawPCB();
             })
             .catch(error => {
                 json_output.value = "Niepoprawne dane wejściowe";
             });
     }
 
-    function drawPCB(responseData) {
-        const canvas = document.getElementById("pcb_image");
+    function drawPCB() {
         const ctx = canvas.getContext("2d");
 
-        const sectionSize = 100;
-
-        canvas.width = (responseData.pcb.sizeX + 1) * sectionSize;
+        const sectionSize = canvas.width / (responseData.pcb.sizeX + 1);
         canvas.height = (responseData.pcb.sizeY + 1) * sectionSize;
 
         for (let i = 0; i < responseData.pcb.sizeX; i++) {

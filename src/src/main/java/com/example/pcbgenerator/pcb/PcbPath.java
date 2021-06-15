@@ -7,13 +7,38 @@ import java.util.Random;
 import static java.lang.Math.abs;
 import static java.lang.Math.min;
 
+/**
+ * Klasa reprezenująca ścieżkę na płytce drukowanej
+ */
 public class PcbPath {
+    /**
+     * Szerokość płytki
+     */
     private int sizeX;
+    /**
+     * Wysokość płytki
+     */
     private int sizeY;
+    /**
+     * Punkt początkowy ścieżki
+     */
     private Point start;
+    /**
+     * Punkt końcowy ścieżki
+     */
     private Point end;
+    /**
+     * Lista sekcji tworzących ścieżkę
+     */
     private List<Section> sections;
 
+    /**
+     * Konstruktor ścieżki dla zadanych parametrów
+     * @param sizeX Szerokość płytki
+     * @param sizeY Wysokość płytki
+     * @param start Punkt początkowy ścieżki
+     * @param end Punkt końcowy ścieżki
+     */
     public PcbPath(int sizeX, int sizeY, Point start, Point end) {
         this.sizeX = sizeX;
         this.sizeY = sizeY;
@@ -22,6 +47,10 @@ public class PcbPath {
         this.sections = new ArrayList<>();
     }
 
+    /**
+     * Konstruktor kopiujący ścieżki
+     * @param other Kopiowana ścieżka
+     */
     public PcbPath(PcbPath other) {
         this.sizeX = other.sizeX;
         this.sizeY = other.sizeY;
@@ -33,6 +62,9 @@ public class PcbPath {
         }
     }
 
+    /**
+     * Metoda generująca ścieżkę w sposób losowy
+     */
     public void generateRandomPath() {
         Random random = new Random();
         int x = start.getX();
@@ -55,6 +87,16 @@ public class PcbPath {
         optimizePath();
     }
 
+    /**
+     * Metoda losująca następny segment w danym wymiarze.
+     * @param actDim współrzędna w danym wymiarze punktu w którym ma zostać dodany segment. Jeśli segment jest horyzontalny to jest to wartość x punktu, w przeciwnym wypadku jest y
+     * @param actEnd współrzędna w danym wymiarze punktu końcowego ścieżki. Jeśli segment jest horyzontalny to jest to wartość x punktu, w przeciwnym wypadku jest y
+     * @param secDim współrzędna w drugim wymiarze punktu w którym ma zostać dodany segment. Jeśli segment jest horyzontalny to jest to wartość y punktu, w przeciwnym wypadku jest x
+     * @param secEnd współrzędna w drugim wymiarze punktu końcowego ścieżki. Jeśli segment jest horyzontalny to jest to wartość y punktu, w przeciwnym wypadku jest x
+     * @param horizontally parametr określający czy dany segment jest horyzontalny
+     * @param size wielkość płytki w danym wymiarze. Jeśli segment jest horyzontalny jest wartość sizeX, w przeciwnym wypadku sizeY
+     * @return liczbę kroków wykonanych w danym wymiarze
+     */
     private int calcSectionInDimension(int actDim, int actEnd, int secDim, int secEnd, boolean horizontally, int size) {
         Random random = new Random();
         int factor = actEnd - actDim;
@@ -77,6 +119,9 @@ public class PcbPath {
         return factor > 0 ? step : -step;
     }
 
+    /**
+     * Metoda optymalizująca ścieżkę poprzez usunięcie zapętleń oraz scalenie następujacych po sobie segmentów w tym samym wymiarze.
+     */
     private void optimizePath() {
         Point point = checkForLoops();
         while (point != null) {
@@ -126,6 +171,10 @@ public class PcbPath {
 
     }
 
+    /**
+     * Metoda wyszukująca zapętleń
+     * @return punkt w którym następuje zapętlenie
+     */
     private Point checkForLoops() {
         int[][] crossArray = new int[sizeX][sizeY];
 
@@ -151,6 +200,9 @@ public class PcbPath {
         return null;
     }
 
+    /**
+     * Metoda scalająca następujące po sobie segmenty w tym samym wymiarze
+     */
     private void deleteDoubleSteps() {
         List<Section> newSections = new ArrayList<>();
         for (var section : sections) {
@@ -168,6 +220,9 @@ public class PcbPath {
         sections = newSections;
     }
 
+    /**
+     * Metoda mutująca ścieżkę. Wybiera losowy segment ścieżki i następnie przesuwa jego fragment o wylosowaną wartość
+     */
     public void mutate() {
         Random random = new Random();
         int sectionIndex = random.nextInt(sections.size());

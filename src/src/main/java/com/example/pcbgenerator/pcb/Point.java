@@ -2,10 +2,25 @@ package com.example.pcbgenerator.pcb;
 
 import java.util.Objects;
 
+/**
+ * Klasa reprezentująca punkt na płytce drukowanej
+ */
 public class Point {
+    /**
+     * Współrzędna x punktu
+     */
     private int x;
+
+    /**
+     * Współrzędna y punktu
+     */
     private int y;
 
+    /**
+     * Konstruktor punktu o określonych współrzędnych
+     * @param x Współrzędna x punktu
+     * @param y Współrzędna y punktu
+     */
     public Point(int x, int y) {
         this.x = x;
         this.y = y;

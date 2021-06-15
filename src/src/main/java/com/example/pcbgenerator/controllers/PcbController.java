@@ -12,11 +12,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class PcbController {
+    /**
+     * Metoda zwraca domyślne wartości parametrów algorytmu genetycznego.
+     */
     @GetMapping("default")
     public Pcb getDefault() {
         return new Pcb();
     }
 
+    /**
+     * Metoda przyjmuje dane płytki psc oraz ewentualne parametry algorytmu genetycznego i zwraca wygenerowane ścieżki lub błąd w przypadku niepoprawnych danch.
+     */
     @PostMapping("/pcb")
     public ResponseEntity getPaths(@RequestBody PcbJsonData pcbJsonData) {
         String mess = pcbJsonData.validate();

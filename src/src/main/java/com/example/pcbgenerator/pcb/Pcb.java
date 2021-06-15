@@ -3,30 +3,114 @@ package com.example.pcbgenerator.pcb;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * Klasa reprezentująca płytkę drukowaną, w oparciu o którą tworzone są rozwiązania.
+ */
 public class Pcb {
+    /**
+     * Szerokość płytki drukowanej
+     */
     private final int sizeX;
+
+    /**
+     * Wysokość płytki drukowanej
+     */
     private final int sizeY;
+
+    /**
+     * Lista punktów rozpoczynających ścieżki
+     */
     private final List<Point> starts;
+
+    /**
+     * Lista punktów kończących ścieżki
+     */
     private final List<Point> ends;
 
+
+    /**
+     * Wartość kary za każde przecięcie. Domyślnie: 1000
+     */
     public final int crossingPenalty;
+
+    /**
+     * Wartość kary za długość ścieżki. Domyślnie: 20
+     */
     public final int pathLengthPenalty;
+
+    /**
+     * Wartość kary za liczbę sekcji wchodzących w skład ścieżki. Domyślnie: 1
+     */
     public final int numberOfSectionsPenalty;
+
+    /**
+     * Wartość kary za każdą ścieżkę która wykroczyła poza obszar płytki drukowanej. Domyślnie: 2000
+     */
     public final int pathsOutOfPcbPenalty;
+
+    /**
+     * Wartość kary za długość ścieżek poza obszarem płytki drukowanej. Domyślnie: 1500
+     */
     public final int pathsOutOfPcbLengthPenalty;
 
+
+    /**
+     * Liczba osobników w jednej populacji. Domyślnie: 100
+     */
     public final int populationSize;
+
+    /**
+     * Liczba osobników losowanych w selektorze turniejowym. Domyślnie: 10
+     */
     public final int tournamentSize;
+
+    /**
+     * Liczba pokoleń w algorytmie genetycznym. Domyślnie: 1000
+     */
     public final int numberOfGenerations;
 
+    /**
+     * Prawdopodobnieństwa krzyżowania rodziców. Domyślnie: 0.6
+     */
     public final double crossingProbability;
+
+    /**
+     * Prawdopodobieństwo z jakim zostanie dokonana zamiana genów rodziców podczas krzyżowania. Domyślnie: 0.2
+     */
     public final double swapProbability;
+
+    /**
+     * Prawdopodobieństo mutacji osobników po krzyżowaniu. Domyślnie: 0.2
+     */
     public final double mutationProbability;
 
+
+    /**
+     * Rodzaj wybranego selektora: true - rulekta, false - turniej. Domyślnie: false
+     */
     public final boolean rouletteSelection;
 
 
+    /**
+     * Konstruktor płytki drukowanej z możliwością doboru wszystkich parametrów.
+     *
+     * @param sizeX                      Szerokość płytki drukowanej. Parametr obligatoryjny
+     * @param sizeY                      Wysokość płytki drukowanej. Parametr obligatoryjny
+     * @param starts                     Lista punktów rozpoczynających ścieżki. Parametr obligatoryjny
+     * @param ends                       Lista punktów kończących ścieżki. Parametr obligatoryjny
+     * @param crossingPenalty            Wartość kary za każde przecięcie. Domyślnie: 1000. Parametr opcjonalny
+     * @param pathLengthPenalty          Wartość kary za długość ścieżki. Domyślnie: 20. Parametr opcjonalny
+     * @param numberOfSectionsPenalty    Wartość kary za liczbę sekcji wchodzących w skład ścieżki. Domyślnie: 1. Parametr opcjonalny
+     * @param pathsOutOfPcbPenalty       Wartość kary za każdą ścieżkę która wykroczyła poza obszar płytki drukowanej. Domyślnie: 2000. Parametr opcjonalny
+     * @param pathsOutOfPcbLengthPenalty Wartość kary za długość ścieżek poza obszarem płytki drukowanej. Domyślnie: 1500. Parametr opcjonalny
+     * @param populationSize             Liczba osobników w jednej populacji. Domyślnie: 100. Parametr opcjonalny
+     * @param tournamentSize             Liczba osobników losowanych w selektorze turniejowym. Domyślnie: 10. Parametr opcjonalny
+     * @param numberOfGenerations        Liczba pokoleń w algorytmie genetycznym. Domyślnie: 1000. Parametr opcjonalny
+     * @param crossingProbability        Prawdopodobnieństwa krzyżowania rodziców. Domyślnie: 0.6. Parametr opcjonalny
+     * @param swapProbability            Prawdopodobieństwo z jakim zostanie dokonana zamiana genów rodziców podczas krzyżowania. Domyślnie: 0.2. Parametr opcjonalny
+     * @param mutationProbability        Prawdopodobieństo mutacji osobników po krzyżowaniu. Domyślnie: 0.2. Parametr opcjonalny
+     * @param rouletteSelection          Rodzaj wybranego selektora: true - rulekta, false - turniej. Domyślnie: false. Parametr opcjonalny
+     */
     public Pcb(int sizeX, int sizeY, List<Point> starts, List<Point> ends, Integer crossingPenalty, Integer pathLengthPenalty,
                Integer numberOfSectionsPenalty, Integer pathsOutOfPcbPenalty, Integer pathsOutOfPcbLengthPenalty,
                Integer populationSize, Integer tournamentSize, Integer numberOfGenerations, Double crossingProbability, Double swapProbability,
@@ -104,12 +188,20 @@ public class Pcb {
         this.ends = ends;
     }
 
+    /**
+     * Konstruktor płytki drukowanej z obiektu przesłanego w zapytaniu HTTP
+     *
+     * @param pjd obiekt przesłany w zapytaniu HTTP
+     */
     public Pcb(PcbJsonData pjd) {
         this(pjd.sizeX, pjd.sizeY, pjd.starts, pjd.ends, pjd.crossingPenalty, pjd.pathLengthPenalty, pjd.numberOfSectionsPenalty,
                 pjd.pathsOutOfPcbPenalty, pjd.pathsOutOfPcbLengthPenalty, pjd.populationSize, pjd.tournamentSize,
                 pjd.numberOfGenerations, pjd.crossingProbability, pjd.swapProbability, pjd.mutationProbability, pjd.rouletteSelection);
     }
 
+    /**
+     * Konstruktor domyślny
+     */
     public Pcb() {
         this.sizeX = 10;
         this.sizeY = 10;
